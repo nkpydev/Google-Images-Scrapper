@@ -30,7 +30,7 @@ if __name__ == '__main__':
     headers = { 'User-Agent': USER_AGENT }
     gogl_img_query = "https://www.google.com/search?q=" + user_input + "&rlz=1C1GCEU_enIN821IN821&source=lnms&tbm=isch&sa=X&ved=0ahUKEwj07uOZgP3hAhUM6Y8KHRqhCJwQ_AUIESgE&biw=1920&bih=969"
     r = requests.get(gogl_img_query,headers=headers)
-    img_link_collection = [n for n in re.findall('"ou":"([a-zA-Z0-9_./:-]+.(?:jpg|jpeg|png))",', r.text)]
+    img_link_collection = [n for n in re.findall('"ou":"([a-zA-Z0-9_./:-]+.(?:jpg|jpeg|png|gif))",', r.text)]
     try:
         print('Started saving images!!')
         for link in img_link_collection:
