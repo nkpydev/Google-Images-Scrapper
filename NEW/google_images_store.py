@@ -5,16 +5,7 @@ from requests.exceptions import SSLError
 from os.path import exists
 from bs4 import BeautifulSoup
 
-
-def get_image_name_and_type(link):
-        temp_split = link.split('/')
-        img_info = temp_split[-1].split('.')
-        return img_info[-2],img_info[-1]
-
-def save_image(img_link,img_name,img_type=None):
-    if (img_type == None) or (img_type == ''):
-        img_type = get_image_name_and_type(img_link)
-    else:
+def save_image(img_link,img_name,img_type):
         try:
             img = requests.get(img_link,stream=True)
             with open(os.path.join(KEYWORD_DIR,img_name + '.' + img_type), 'wb') as f:
@@ -22,6 +13,8 @@ def save_image(img_link,img_name,img_type=None):
                     f.write(chunk)    
         except SSLError:
             print('SSL Error, Image from this link cannot be downloaded!!')
+
+image_types = ["jpeg", "jpg", "png", "gif", "tiff", "psd", "raw"]
 
 if __name__ == "__main__":
     query = input("\nEnter your query:\t")
@@ -62,5 +55,14 @@ if __name__ == "__main__":
     print("\nTotal images to download are:\t{}".format(img_counter))
 
     for dict_entry in dict_store:
-        if dict_entry['ou']:
-            print(dict_entry['ou'],dict_entry['id'],dict_entry['ity'])
+        if dict_entry['ou'] and (':' not in dict_entry['id']) and dict_entry['ity'] != '':
+            save_image(dict_entry['ou'],dict_entry['id'],dict_entry['ity'])
+        elif dict_entry['ou'] and dict_entry['ity'] != '':
+            if ':' in dict_entry['id']:
+                updated_id = dict_entry['id'].replace(':','')
+                save_image(dict_entry['ou'],updated_id,dict_entry['ity'])
+        else:
+            if dict_entry['ou'] and (':' not in dict_entry['id']) and dict_entry['ity'] == '':
+                for imge_type in image_types:
+                    if imge_type in dict_entry['ity']:
+                        save_image(dict_entry['ou'],dict_entry['id'],imge_type)
